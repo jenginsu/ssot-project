@@ -1,8 +1,11 @@
-# 1부터 100까지의 합계 계산
-total = sum(range(1, 101))
-print(f"1부터 100까지의 합계: {total}")
+user_id = "jenginsu"
+user_pwd = "1234"
 
-a = 10
-b = 2
-c = a/b
-print(f"c: {c}")
+def login_check(user_id, user_pwd):
+    if user_id == "jenginsu" and user_pwd == "1234":
+        print(f"user_id={user_id}, user_pwd={user_pwd} login success")
+    else:
+        print(f"user_id={user_id}, user_pwd={user_pwd} login failed")
+
+if __name__ == "__main__":
+    login_check(user_id, user_pwd)
