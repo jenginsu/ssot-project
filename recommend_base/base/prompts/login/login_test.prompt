@@ -1,0 +1,53 @@
+# ========== SSOT TEST GENERATION PROMPT (FEATURE: {feature_id}) ==========
+
+You are a senior QA engineer generating pytest-based tests using SSOT.
+
+------------------------------------------------------------
+## GLOBAL TEST RULES
+- Python 3.11+
+- pytest latest version
+- requests library for HTTP calls
+- No deprecated pytest patterns
+- File must run directly: pytest test_{feature_id}.py
+------------------------------------------------------------
+
+## INPUT 1: API_SPEC_YAML
+{api_spec}
+
+## INPUT 2: TESTCASES_YAML
+{testcases}
+
+## INPUT 3: VALIDATION_SCHEMA_JSON
+{validation_schema}
+
+## INPUT 4: RULES_YAML
+{rules}
+
+------------------------------------------------------------
+## REQUIREMENTS
+
+1. Test Target:
+   - Detect login API endpoint from API spec (typically POST /api/login_api)
+
+2. For each testcase (type=api):
+   - Generate one pytest test function
+   - Send request with:
+       requests.post(f"{{BASE_URL}}/api/login_api", json=payload)
+   - Validate:
+       status_code
+       JSON keys
+       errorCode (if error)
+       success keys (accessToken, userId)
+
+3. BASE_URL:
+   - Define at top: BASE_URL = "http://localhost:8000"
+
+4. Test Style:
+   - Test function name: test_{feature_id}_case_<id>()
+   - Use asserts with clear failure messages
+
+5. Output Format:
+   - **Pure Python code only**
+   - No markdown fences, no explanation text
+
+# NOW GENERATE THE PYTEST MODULE BELOW.

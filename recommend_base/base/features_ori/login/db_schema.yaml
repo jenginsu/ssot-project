@@ -1,0 +1,28 @@
+database:
+  dbms: mysql          # mysql | oracle | postgres | mariadb ...
+  version: "8.0"
+  schema: ssot         # MySQL이면 보통 db이름, Oracle이면 스키마명
+  charset: utf8mb4     # 선택
+
+tables:
+  user:
+    table_name: tbl_member
+    description: "회원 정보 테이블"
+    primary_key: user_id
+    columns:
+      user_id:
+        type: string
+        nullable: false
+      email:
+        type: string
+        nullable: false
+        unique: true
+      password_hash:
+        type: string
+        nullable: false
+      created_at:
+        type: datetime
+        nullable: false
+      updated_at:
+        type: datetime
+        nullable: false

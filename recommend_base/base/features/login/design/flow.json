@@ -1,0 +1,19 @@
+{
+    "flows": [
+      {
+        "fromScreen": "LoginPage",
+        "event": "click",
+        "sourceComponentId": "btn_login",
+        "toScreen": "HomePage",
+        "condition": "login_success"
+      },
+      {
+        "fromScreen": "LoginPage",
+        "event": "click",
+        "sourceComponentId": "link_signup",
+        "toScreen": "SignupPage",
+        "condition": "always"
+      }
+    ]
+  }
+  

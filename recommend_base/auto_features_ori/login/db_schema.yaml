@@ -1,0 +1,30 @@
+db_schema:
+  dbms: mysql
+  version: '8.0'
+  schema: ssot
+  charset: utf8mb4
+  tables:
+  - name: tbl_member
+    description: 회원 정보
+    primary_key:
+    - user_id
+    columns:
+    - name: user_id
+      type: varchar(20)
+      nullable: false
+      description: 사용자 ID
+    - name: email
+      type: varchar(255)
+      nullable: false
+      unique: true
+      description: 이메일
+    - name: password_hash
+      type: varchar(255)
+      nullable: false
+      description: 비밀번호 해시
+    - name: created_at
+      type: datetime
+      nullable: false
+    - name: updated_at
+      type: datetime
+      nullable: false

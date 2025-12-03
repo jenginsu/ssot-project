@@ -1,0 +1,240 @@
+# recommend_base/{feature_id}_feature_spec.yaml
+feature_id: login
+name: "로그인 기능"
+domain: "auth"
+
+summary: >
+  사용자가 이메일과 비밀번호로 로그인하는 기능.
+  로그인 성공 시 accessToken과 userId를 반환한다.
+
+owner:
+  pm: "홍길동"
+  dev: "김개발"
+  qa: "이테스터"
+
+# ----------------------------------------------------------------------
+# 1) API 요약 (미니 스펙) - 여기만 채워도 api.yaml 뽑을 수 있게
+# ----------------------------------------------------------------------
+api:
+  path: "/api/login_api"
+  method: POST
+  summary: "사용자 로그인 API"
+  tags: ["auth", "login"]
+
+  request:
+    description: "로그인 요청 바디"
+    fields:
+      - name: email
+        type: string
+        format: email
+        required: true
+        description: "로그인 이메일"
+      - name: password
+        type: string
+        required: true
+        description: "로그인 비밀번호"
+
+  responses:
+    - name: success
+      http_status: 200
+      description: "로그인 성공"
+      body:
+        type: object
+        fields:
+          - name: accessToken
+            type: string
+            description: "액세스 토큰"
+          - name: userId
+            type: string
+            description: "사용자 ID"
+
+    - name: invalid_input
+      http_status: 400
+      description: "요청 값 오류"
+      error_code: "INVALID_PASSWORD_FORMAT"   # 대표 에러 코드
+      body:
+        type: object
+        fields:
+          - name: errorCode
+            type: string
+
+    - name: login_failed
+      http_status: 401
+      description: "인증 실패(이메일 또는 비밀번호 불일치)"
+      error_code: "LOGIN_FAILED"
+      body:
+        type: object
+        fields:
+          - name: errorCode
+            type: string
+
+    - name: account_locked
+      http_status: 401
+      description: "계정 잠김 상태"
+      error_code: "ACCOUNT_LOCKED"
+      body:
+        type: object
+        fields:
+          - name: errorCode
+            type: string
+
+# ----------------------------------------------------------------------
+# 2) DB 구조 (db_schema.yaml용 미니 스펙)
+# ----------------------------------------------------------------------
+db:
+  dbms: "mysql"
+  version: "8.0"
+  schema: "ssot"
+  charset: "utf8mb4"
+  tables:
+    - name: "tbl_member"
+      description: "회원 정보"
+      primary_key: ["user_id"]
+      columns:
+        - name: "user_id"
+          type: string
+          length: 20
+          nullable: false
+          description: "사용자 ID"
+
+        - name: "email"
+          type: string
+          length: 255
+          nullable: false
+          unique: true
+          description: "이메일"
+
+        - name: "password_hash"
+          type: string
+          length: 255
+          nullable: false
+          description: "비밀번호 해시"
+
+        # 🔽 계정 잠금 로직을 위한 추가 컬럼들
+        - name: "fail_count"
+          type: integer
+          nullable: false
+          default: 0
+          description: "연속 로그인 실패 횟수"
+
+        - name: "is_locked"
+          type: boolean
+          nullable: false
+          default: false
+          description: "계정 잠금 여부"
+
+        - name: "locked_at"
+          type: datetime
+          nullable: true
+          description: "계정 잠금 시각"
+
+        - name: "created_at"
+          type: datetime
+          nullable: false
+
+        - name: "updated_at"
+          type: datetime
+          nullable: false
+
+# ----------------------------------------------------------------------
+# 3) 검증/업무 RULE (rules.yaml + validation_schema.json 공통 원본)
+# ----------------------------------------------------------------------
+validation:
+  fields:
+    email:
+      type: string
+      required: true
+      format: email
+      max_length: 255
+      errors:
+        invalid_format: "INVALID_EMAIL_FORMAT"
+        required: "MISSING_REQUIRED_FIELD"
+
+    password:
+      type: string
+      required: true
+      min_length: 8
+      pattern: "(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}"
+      description: "대문자/소문자/숫자/특수문자를 모두 포함한 8자리 이상"
+      errors:
+        invalid_format: "INVALID_PASSWORD_FORMAT"
+        required: "MISSING_REQUIRED_FIELD"
+
+business_rules:
+  login:
+    description: "이메일 + 비밀번호로 로그인"
+    fail_error_code: "LOGIN_FAILED"
+
+    # 🔽 신규 추가: 계정 잠금 정책
+    max_fail_count: 5           # 연속 로그인 실패 허용 횟수
+    lock_on_fail: true          # 허용 횟수 초과 시 계정 잠금 여부
+    lock_error_code: "ACCOUNT_LOCKED"
+
+    notes:
+      - "로그인 비밀번호를 연속 5회 틀리면 계정을 잠금 처리한다."
+      - "잠금 상태에서는 로그인 요청 시 항상 ACCOUNT_LOCKED 에러를 반환한다."
+
+# ----------------------------------------------------------------------
+# 4) 테스트 케이스 (testcases.yaml 원본)
+# ----------------------------------------------------------------------
+testcases:
+  - id: "TC_LOGIN_001"
+    type: "api"
+    name: "정상 로그인"
+    precondition: "DB에 user1@example.com / Pass@word1 계정이 존재"
+    input:
+      email: "user1@example.com"
+      password: "Pass@word1"
+    expected:
+      http_status: 200
+      body:
+        has_fields: ["accessToken", "userId"]
+
+  - id: "TC_LOGIN_002"
+    type: "api"
+    name: "잘못된 비밀번호"
+    precondition: "DB에 user1@example.com / Pass@word1 계정이 존재"
+    input:
+      email: "user1@example.com"
+      password: "WrongPass!1"
+    expected:
+      http_status: 401
+      body:
+        errorCode: "LOGIN_FAILED"
+
+  - id: "TC_LOGIN_003"
+    type: "api"
+    name: "비밀번호 형식 오류"
+    input:
+      email: "user1@example.com"
+      password: "short"
+    expected:
+      http_status: 400
+      body:
+        errorCode: "INVALID_PASSWORD_FORMAT"
+
+  - id: "TC_LOGIN_004"
+    type: "api"
+    name: "5회 연속 로그인 실패 후 계정 잠김"
+    precondition: >
+      DB에 user1@example.com / Pass@word1 계정이 존재하고,
+      초기 fail_count = 0, is_locked = false 상태여야 함.
+    steps:
+      - description: "1~4번째 로그인 실패 (LOGIN_FAILED 유지)"
+        repeat: 4
+        input:
+          email: "user1@example.com"
+          password: "WrongPass!1"
+        expected:
+          http_status: 401
+          body:
+            errorCode: "LOGIN_FAILED"
+
+      - description: "5번째 로그인 실패 시 계정 잠김 발생"
+        input:
+          email: "user1@example.com"
+          password: "WrongPass!1"
+        expected:
+          http_status: 401
+          body:
+            errorCode: "ACCOUNT_LOCKED"

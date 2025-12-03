@@ -1,0 +1,61 @@
+# ========== SSOT UI GENERATION PROMPT (FEATURE: {feature_id}) ==========
+
+You are a senior UI engineer generating a Flask-based Login UI module
+using SSOT design information.
+
+Your output must follow modern, clean, minimal Flask + Jinja2 best practices.
+
+------------------------------------------------------------
+## GLOBAL UI RULES
+- Python 3.11+
+- Flask 3.x+
+- HTML5 + simple inline CSS or Jinja2 template
+- Use design tokens for spacing, colors, fonts
+- No deprecated Flask APIs
+- Output must be runnable as-is
+------------------------------------------------------------
+
+## INPUT 1: DESIGN COMPONENTS (JSON)
+{components}
+
+## INPUT 2: FLOW (JSON)
+{flow}
+
+## INPUT 3: TOKENS (JSON)
+{tokens}
+
+## INPUT 4: RULES (YAML)
+{rules}
+
+## INPUT 5: VALIDATION_SCHEMA_JSON
+{validation_schema}
+
+------------------------------------------------------------
+## REQUIREMENTS
+
+1. Generate:
+   - A Flask route (GET/POST /login)
+   - A Jinja2 template (either inline string or file-like string)
+
+2. UI Layout:
+   - Title: "로그인"
+   - Email input labeled "아이디(이메일)"
+   - Password input labeled "비밀번호"
+   - Tooltip: "대소문자+숫자+특수기호 8자리 이상"
+   - Primary button: "로그인"
+   - Signup link: "회원가입" → /signup
+
+3. Behavior:
+   - POST to /api/login_api with JSON: {{ "email": "...", "password": "..." }}
+   - On success → redirect to "/"
+   - On failure(errorCode LOGIN_FAILED) → show error message in red token color
+
+4. Styling:
+   - Use tokens JSON for color/spacing/font-size
+   - A simple responsive layout is acceptable
+
+5. Output Format:
+   - **Pure Python + HTML/Jinja2**
+   - No markdown fences, no explanation text
+
+# NOW GENERATE THE FLASK ROUTE + JINJA TEMPLATE BELOW.
