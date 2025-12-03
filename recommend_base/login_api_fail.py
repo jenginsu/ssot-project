@@ -55,8 +55,9 @@ conn.commit()
 cur.execute("DELETE FROM users")
 cur.execute("INSERT INTO users (email, password) VALUES ('user1@example.com', 'Password!1')")
 cur.execute("INSERT INTO users (email, password) VALUES ('user2@example.com', 'Password!2')")
+cur.execute("INSERT INTO users (email, password) VALUES ('user2@example.com', 'Password!2')")
 conn.commit()
-conn.close()
+#conn.close()
 
 
 @app.post("/api/login")
