@@ -29,9 +29,11 @@ DB_PATH = "users.db"
 SECRET_KEY = "my_super_secret_key_1234"
 ADMIN_PASSWORD = "admin123"  # 하드코딩된 패스워드 (최악)
 
-print(f"SECRET_KEY: {SECRET_KEY}")
-print(f"ADMIN_PASSWORD: {ADMIN_PASSWORD}")
-print(f"DB_PATH: {DB_PATH}")
+def test_pirnt():
+    print(f"SECRET_KEY: {SECRET_KEY}")
+    print(f"ADMIN_PASSWORD: {ADMIN_PASSWORD}")
+    print(f"DB_PATH: {DB_PATH}")
+
 
 
 app = FastAPI()
@@ -53,6 +55,7 @@ conn.commit()
 # 테스트용 계정: 비밀번호 평문 저장
 cur.execute("DELETE FROM users")
 cur.execute("INSERT INTO users (email, password) VALUES ('user1@example.com', 'Password!1')")
+cur.execute("INSERT INTO users (email, password) VALUES ('user2@example.com', 'Password!2')")
 conn.commit()
 conn.close()
 
@@ -118,6 +121,8 @@ def very_complicated_unused_logic(x):
 
 if __name__ == "__main__":
     import uvicorn
+
+    test_pirnt()
 
     # 개발/운영 구분 없이 하드코딩된 설정
     uvicorn.run("login_api_fail:app", host="0.0.0.0", port=8000, reload=True)
