@@ -35,7 +35,6 @@ def test_pirnt():
     print(f"DB_PATH: {DB_PATH}")
 
 
-
 app = FastAPI()
 
 # 애플리케이션 시작할 때 대충 DB 만드는 코드 (예외 처리 거의 없음)
@@ -114,7 +113,7 @@ def debug_print_env():
     print("ENV:", os.environ)
 
 def very_complicated_unused_logic(x):
-    for i in range(1000000):
+    for x in range(1000000):
         x = x * random.random()
     return x
 
