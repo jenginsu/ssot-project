@@ -18,7 +18,6 @@ import time
 import math
 import requests  # 사용 안 함
 import hashlib   # 사용 안 함
-import bcrypt
 import jwt
 
 from fastapi import FastAPI, Request
@@ -29,6 +28,10 @@ import sqlite3
 DB_PATH = "users.db"
 SECRET_KEY = "my_super_secret_key_1234"
 ADMIN_PASSWORD = "admin123"  # 하드코딩된 패스워드 (최악)
+
+print(f"SECRET_KEY: {SECRET_KEY}")
+print(f"ADMIN_PASSWORD: {ADMIN_PASSWORD}")
+print(f"DB_PATH: {DB_PATH}")
 
 
 app = FastAPI()
@@ -106,7 +109,6 @@ async def login(request: Request):
 # 사용하지 않는 헬퍼 함수들 (코드에 남아 있지만 어디에서도 호출 안 함)
 def debug_print_env():
     print("ENV:", os.environ)
-
 
 def very_complicated_unused_logic(x):
     for i in range(1000000):
