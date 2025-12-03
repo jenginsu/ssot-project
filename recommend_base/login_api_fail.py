@@ -18,6 +18,8 @@ import time
 import math
 import requests  # 사용 안 함
 import hashlib   # 사용 안 함
+import bcrypt
+import jwt
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
